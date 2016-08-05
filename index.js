@@ -42,32 +42,32 @@ const compose = (f, g) => x => f(g(x))
 
 const normalizeAndGetHeight = compose(mapDataToBarHeight, normalize)
 
-function render (nums, index) {
+function render (nums, movingIndex) {
   ctx.fillStyle = 'white'
   ctx.fillRect(0,0, CANVAS_WIDTH, CANVAS_HEIGHT)
   const numBars = nums.length
   const barWidth = CANVAS_WIDTH / numBars
   const bars = normalizeAndGetHeight(nums)
-  bars.forEach((height, i) => {
-    if (i === index)
-      ctx.fillStyle = 'yellow'
-    else
-      ctx.fillStyle = 'green'
-    ctx.fillRect(i * barWidth, CANVAS_HEIGHT - height, barWidth, height)
-    ctx.strokeRect(i * barWidth, CANVAS_HEIGHT - height, barWidth, height)
+  bars.forEach((barHeight, i) => {
+    const offsetX = i * barWidth
+    const offsetY = CANVAS_HEIGHT - barHeight
+
+    ctx.fillStyle = i === movingIndex ? 'yellow' : 'green'
+
+    ctx.fillRect(offsetX, offsetY, barWidth, barHeight)
+    ctx.strokeRect(offsetX, offsetY, barWidth, barHeight)
   })
 }
 
 function go (nums, speed) {
   const gen = insertionSortGenerator(nums)
-  let interval = setInterval(() => {
-    console.log('test')
+  let gameInterval = setInterval(() => {
     const data = gen.next()
     if (!data.done) {
       const [arr, index] = data.value
       render(arr, index)
     } else {
-      clearInterval(interval)
+      clearInterval(gameInterval)
     }
   }, speed)
 }
